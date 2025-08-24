@@ -1,3 +1,8 @@
+#include <algorithm>
+#include <array>
+#include <numeric>
+#include <random>
+
 #include "perlin.hpp"
 
 namespace Lapine::Noise {
@@ -70,5 +75,16 @@ namespace Lapine::Noise {
     double n11 = dot(g11, xo -1.0, yo - 1.0);
 
     return lerp(yf, lerp(xf, n00, n10), lerp(xf, n01, n11));
+  }
+
+  auto Perlin::gen_permutations(uint64_t seed) -> Perlin::Permutations {
+    std::array<uint8_t, 512> perms;
+    auto first = std::begin(perms);
+    auto pivot = first + 256;
+    std::iota(std::begin(perms), pivot, 0);
+    std::default_random_engine rng(seed);
+    std::shuffle(first, pivot, rng);
+    std::copy(first, pivot, pivot);
+    return perms;
   }
 }

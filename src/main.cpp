@@ -10,12 +10,18 @@
 
 #include "clamp.hpp"
 #include "gui.hpp"
+#include "noise2d.hpp"
 #include "perlin.hpp"
 
 const int WIN_W = 640;
 const int WIN_H = 480;
 
-static auto render_noise(raylib::Image& img, const Lapine::Gui& gui) -> void;
+static auto render_noise(
+  Lapine::Noise::Noise2D&,
+  raylib::Image& img,
+  const Lapine::Gui& gui
+) -> void;
+
 static auto last_tick = 
   std::chrono::time_point_cast
   <std::chrono::milliseconds>
@@ -28,16 +34,21 @@ static auto sinusoid(
   double phase = 0.0) -> double;
 
 auto main(int argc, char* argv[]) -> int {
-  auto win = raylib::Window{WIN_W, WIN_H, "hello"};
+  auto win = raylib::Window{WIN_W, WIN_H, "perlin"};
   win.SetTargetFPS(30);
 
   Lapine::Gui gui;
   raylib::Image img{WIN_W, WIN_H};
-  render_noise(img, gui);
+
+  auto perms  = Lapine::Noise::Perlin::gen_permutations();
+  auto perlin = Lapine::Noise::Perlin{perms};
+  auto gen   = Lapine::Noise::Clamp{perlin};
+
+  render_noise(gen, img, gui);
   raylib::Texture2D tex{img};
 
   while (!win.ShouldClose()) {
-    render_noise(img,gui);
+    render_noise(gen, img,gui);
     tex.Update(img.GetData());
     win.BeginDrawing();
     win.ClearBackground(raylib::Color::DarkGray());
@@ -49,10 +60,11 @@ auto main(int argc, char* argv[]) -> int {
   return EXIT_SUCCESS;
 }
 
-static auto render_noise(raylib::Image& img, const Lapine::Gui& gui) -> void {
-  Lapine::Noise::Perlin perlin{};
-  Lapine::Noise::Clamp  clamped{perlin};
-
+static auto render_noise(
+  Lapine::Noise::Noise2D& gen,
+  raylib::Image& img, 
+  const Lapine::Gui& gui
+) -> void {
   const int  w  = img.GetWidth();
   const int  h  = img.GetHeight();
   const auto wf = static_cast<double>(w);
@@ -77,7 +89,7 @@ static auto render_noise(raylib::Image& img, const Lapine::Gui& gui) -> void {
 
       const auto xmod = sinusoid(dt / 1'000.0, xfreq, amp, phase);
       const auto ymod = sinusoid(dt / 1'000.0, yfreq, amp, phase);
-      const auto vf   = (1.0 + clamped.noise(xf, yf * ymod)) / 2.0;
+      const auto vf   = (1.0 + gen.noise(xf, yf * ymod)) / 2.0;
       const auto v    = static_cast<uint8_t>(vf * 255.0);
       img.DrawPixel(x, y, raylib::Color{v, v, v});
     }
@@ -90,5 +102,5 @@ static auto sinusoid(
     const double amp  ,
     const double phase) -> double {
   static const double tau = 2.0*std::numbers::pi;
-  return amp * sin((tau/4.0) * freq * time + phase);
+  return amp * sin(tau * freq * time + phase);
 }

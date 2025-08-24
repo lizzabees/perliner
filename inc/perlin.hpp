@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include <array>
+#include <chrono>
 
 #include "noise2d.hpp"
 
@@ -11,6 +12,13 @@ namespace Lapine::Noise {
   public:
     using Permutations = std::array<uint8_t, 512>;
     const static Permutations DEFAULT_PERMUTATIONS;
+
+    static auto gen_permutations(
+      uint64_t seed = std::chrono::steady_clock
+        ::now()
+         .time_since_epoch()
+         .count()
+    ) -> Permutations;
 
   private:
     using Gradient = std::array<double, 3>;

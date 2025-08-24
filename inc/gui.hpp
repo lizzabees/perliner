@@ -2,12 +2,11 @@
 
 namespace Lapine {
   struct Gui {
-    double freq  = 0.0;
-    double amp   = 1.0;
-    double phase = 0.0;
+    float xfreq  = 1.00f;
+    float yfreq  = 1.00f;
+    float amp    = 1.00f;
+    float phase  = 0.00f;
 
-    void run() {
-      
-    }
+    auto run() -> void;
   };
 }

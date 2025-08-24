@@ -1,20 +1,37 @@
 add_executable(${PROJECT_NAME})
-target_include_directories(${PROJECT_NAME} PUBLIC inc)
-target_link_libraries(${PROJECT_NAME} raylib raylib_cpp raygui)
+target_include_directories(
+  ${PROJECT_NAME}
+    PUBLIC  inc
+    PRIVATE dep
+)
+
+target_link_libraries(${PROJECT_NAME}
+  raylib
+  raylib_cpp
+)
 
 target_sources(${PROJECT_NAME}
   PUBLIC
-    FILE_SET HEADERS BASE_DIRS ${PROJECT_SOURCE_DIR}/inc FILES 
-      ../inc/clamp.hpp
-      ../inc/gui.hpp
-      ../inc/noise2d.hpp
-      ../inc/perlin.hpp
+    FILE_SET HEADERS
+      BASE_DIRS
+        ${PROJECT_SOURCE_DIR}/inc
+        ${PROJECT_SOURCE_DIR}/dep
+      FILES 
+        ../inc/clamp.hpp
+        ../inc/gui.hpp
+        ../inc/noise2d.hpp
+        ../inc/perlin.hpp
+
+        ../dep/raygui.h
+        ../dep/style_lavanda.h
 
   PRIVATE
     clamp.cpp
     gui.cpp
     main.cpp
     perlin.cpp
+
+    ../dep/raygui.c
 )
 
 set_target_properties(

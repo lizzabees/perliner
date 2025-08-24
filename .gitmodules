@@ -1,0 +1,3 @@
+[submodule "raygui_cpp"]
+	path = dep/raygui_cpp
+	url = https://github.com/scastd/raygui-cpp.git

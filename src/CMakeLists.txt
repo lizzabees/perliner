@@ -6,11 +6,13 @@ target_sources(${PROJECT_NAME}
   PUBLIC
     FILE_SET HEADERS BASE_DIRS ${PROJECT_SOURCE_DIR}/inc FILES 
       ../inc/clamp.hpp
+      ../inc/gui.hpp
       ../inc/noise2d.hpp
       ../inc/perlin.hpp
 
   PRIVATE
     clamp.cpp
+    gui.cpp
     main.cpp
     perlin.cpp
 )
